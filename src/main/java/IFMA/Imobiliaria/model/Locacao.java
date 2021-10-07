@@ -21,13 +21,13 @@ public class Locacao {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @PositiveOrZero
+
     private Integer ativo;
     private Integer dia_vencimento;
     private Double perc_multa;
     private Double valor_alugue;
 
-    @NotBlank
+
     private String obs;
 
     @Temporal(TemporalType.DATE)

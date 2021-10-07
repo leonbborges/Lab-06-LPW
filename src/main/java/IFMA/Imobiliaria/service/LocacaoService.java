@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +33,10 @@ public class LocacaoService {
         return locacaoRepository.findById(id)
                 .orElseThrow(()-> new BadRequestEx("Locacao ID not found"));
     }
+
+    @Transactional
     public Locacao  save(Locacao  locacao) {
-        Long imovelId = locacao.getImovel().getId().;
+        Long imovelId = locacao.getImovel().getId();
         Long clienteId = locacao.getCliente().getId();
 
         Cliente cliente = clienteService.findByIdORTrowBadRequestException(clienteId);
@@ -42,16 +45,9 @@ public class LocacaoService {
         locacao.setImovel(imovel);
         locacao.setCliente(cliente);
 
-        return  locacaoRepository.save(locacao).builder().alugueis(locacao.getAlugueis())
-                .ativo(locacao.getAtivo())
-                .data_fim(locacao.getData_fim())
-                .data_inicio(locacao.getData_inicio())
-                .dia_vencimento(locacao.getDia_vencimento())
-                .obs(locacao.getObs())
-                .perc_multa(locacao.getPerc_multa())
-                .valor_alugue(locacao.getValor_alugue())
-                .build();
+        return  locacaoRepository.save(locacao);
 }
+
     public void delete(Long id) {
         locacaoRepository.delete(findByIdORTrowBadRequestException(id));
     }

@@ -1,7 +1,13 @@
-package IFMA.Imobiliaria.controller;
+package IFMA.Imobiliaria.controller.dtos;
 
 
+import IFMA.Imobiliaria.model.Cliente;
+import IFMA.Imobiliaria.model.Imoveis;
 import IFMA.Imobiliaria.model.Locacao;
+import IFMA.Imobiliaria.repository.ClienteRepository;
+import IFMA.Imobiliaria.repository.Imoveisrepository;
+import IFMA.Imobiliaria.service.ClienteService;
+import IFMA.Imobiliaria.service.ImoveisService;
 import IFMA.Imobiliaria.service.LocacaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +30,18 @@ public class LocacaoController {
     @Autowired
     private final LocacaoService locacaoService;
 
+    @Autowired
+    private Imoveisrepository imoveisrepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private ClienteService clienteService;
+
+    @Autowired
+    private ImoveisService imoveisService;
+
     @GetMapping
     public ResponseEntity<Page<Locacao>> list(@RequestParam(required = false) String nome,
                                               @PageableDefault(sort = "id", direction = Sort.Direction.ASC, page = 0, size = 5)
@@ -35,8 +53,21 @@ public class LocacaoController {
         return ResponseEntity.ok( locacaoService.findByIdORTrowBadRequestException(id));
     }
     @PostMapping
-    public ResponseEntity<Locacao> save(@RequestBody @Valid Locacao locacao){
-        return new ResponseEntity<>(locacaoService.save(locacao), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Locacao save(@RequestBody @Valid LocacaoDto locacaoDto){
+        System.out.println("ID: " + locacaoDto.getCliente().getId());
+        System.out.println("ID: " + locacaoDto.getImovel().getId());
+
+        Locacao locacao = new Locacao();
+        locacao.setAtivo(locacaoDto.getAtivo());
+        locacao.setObs(locacaoDto.getObs());
+        Cliente cliente = clienteService.findByIdORTrowBadRequestException(locacaoDto.getCliente().getId());
+        Imoveis imovel = imoveisService.findByIdORTrowBadRequestException(locacaoDto.getCliente().getId());
+
+        locacao.setCliente(cliente);
+        locacao.setImovel(imovel);
+
+        return locacaoService.save(locacao);
 
     }
     @DeleteMapping(path = "/{id}")
