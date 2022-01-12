@@ -1,5 +1,9 @@
 package IFMA.Imobiliaria.controller;
 
+import IFMA.Imobiliaria.dtos.ClienteDto;
+import IFMA.Imobiliaria.dtos.ClienteInput;
+import IFMA.Imobiliaria.mapper.ClienteConvertA;
+import IFMA.Imobiliaria.mapper.ClienteConvertD;
 import IFMA.Imobiliaria.model.Cliente;
 import IFMA.Imobiliaria.service.ClienteService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
@@ -23,6 +26,11 @@ import java.util.List;
 public class ClienteController {
     @Autowired
     private final ClienteService clienteService;
+    @Autowired
+    private ClienteConvertA clienteConvertAssembler;
+
+    @Autowired
+    private ClienteConvertD clienteConvertDISAssembler;
 
     @GetMapping
     public ResponseEntity<Page<Cliente>> list(@RequestParam(required = false) String nome,
@@ -35,16 +43,21 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.findByIdORTrowBadRequestException(id));
     }
     @PostMapping
-    public ResponseEntity<Cliente> save(@RequestBody @Valid Cliente cliente){
-        return new ResponseEntity<>(clienteService.save(cliente), HttpStatus.CREATED);
-
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClienteDto save (@RequestBody @Valid ClienteInput clienteInput) {
+        return clienteConvertAssembler
+                .convert_DTO(clienteService.save(
+                        clienteConvertDISAssembler.convert_model(clienteInput)
+                ));
     }
+
     @DeleteMapping(path = "/{id}")
     public ResponseEntity <Void> delete(@PathVariable Long id){
         clienteService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @PutMapping
+
+    @PutMapping(path = "/{id}")
     public ResponseEntity <Void> replace(@RequestBody @Valid Cliente cliente){
         clienteService.replace(cliente);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

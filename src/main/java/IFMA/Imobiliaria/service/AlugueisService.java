@@ -24,8 +24,8 @@ public class AlugueisService {
                 .orElseThrow(()-> new BadRequestEx("aluguel ID not found"));
     }
     public Alugueis save(Alugueis alugueis){
+
         return  alugueisRepository.save(alugueis).builder()
-                .locacao(alugueis.getLocacao())
                 .dt_vencimento(alugueis.getDt_vencimento())
                 .obs(alugueis.getObs())
                 .valor_pago(alugueis.getValor_pago())
@@ -36,7 +36,6 @@ public class AlugueisService {
     public void replace(Alugueis alugueis){
         Alugueis saveAluguel = findByIdORTrowBadRequestException(alugueis.getId());
         Alugueis alugueis1 = Alugueis.builder()
-                .locacao(alugueis.getLocacao())
                 .dt_vencimento(alugueis.getDt_vencimento())
                 .obs(alugueis.getObs())
                 .valor_pago(alugueis.getValor_pago())

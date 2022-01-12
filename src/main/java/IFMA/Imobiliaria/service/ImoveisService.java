@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +23,18 @@ public class ImoveisService {
         return imoveisrepository.findById(id)
                 .orElseThrow(()-> new BadRequestEx("Imovel ID not found"));
     }
-    public Imoveis save(Imoveis imoveis) {
-        return  imoveisrepository.save(Imoveis.builder().tipo_imovel(imoveis.getTipo_imovel())
-                .endereco(imoveis.getEndereco())
-                .banheiros(imoveis.getBanheiros())
-                .cep(imoveis.getCep())
-                .dormitorios(imoveis.getDormitorios())
-                .metragem(imoveis.getMetragem())
-                .obs(imoveis.getObs())
-                .suites(imoveis.getSuites())
-                .valor_aluguel_sug(imoveis.getValor_aluguel_sug())
-                .build());
+    @Transactional
+    public Imoveis save(Imoveis imovel) {
+        return imoveisrepository.save(imovel);
     }
+
+    @Transactional
     public void delete(Long id) {
         imoveisrepository.delete(findByIdORTrowBadRequestException(id));
     }
 
+
+    @Transactional
     public void replace(Imoveis imoveis) {
         Imoveis saveCliente= findByIdORTrowBadRequestException(imoveis.getId());
         Imoveis imoveis1 = Imoveis.builder()

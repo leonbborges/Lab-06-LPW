@@ -1,4 +1,4 @@
-package IFMA.Imobiliaria.controller.dtos;
+package IFMA.Imobiliaria.dtos;
 
 import lombok.Getter;
 import lombok.Setter;

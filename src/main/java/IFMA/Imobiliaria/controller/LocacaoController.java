@@ -1,8 +1,10 @@
-package IFMA.Imobiliaria.controller.dtos;
+package IFMA.Imobiliaria.controller;
 
 
-import IFMA.Imobiliaria.model.Cliente;
-import IFMA.Imobiliaria.model.Imoveis;
+import IFMA.Imobiliaria.dtos.LocacaoDto;
+import IFMA.Imobiliaria.dtos.LocacaoInput;
+import IFMA.Imobiliaria.mapper.LocacaoConvertA;
+import IFMA.Imobiliaria.mapper.LocacaoConvertD;
 import IFMA.Imobiliaria.model.Locacao;
 import IFMA.Imobiliaria.repository.ClienteRepository;
 import IFMA.Imobiliaria.repository.Imoveisrepository;
@@ -31,6 +33,12 @@ public class LocacaoController {
     private final LocacaoService locacaoService;
 
     @Autowired
+    private LocacaoConvertA locacaoConvertAssembler;
+
+    @Autowired
+    private LocacaoConvertD locacaoConvertD;
+
+    @Autowired
     private Imoveisrepository imoveisrepository;
 
     @Autowired
@@ -54,20 +62,11 @@ public class LocacaoController {
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Locacao save(@RequestBody @Valid LocacaoDto locacaoDto){
-        System.out.println("ID: " + locacaoDto.getCliente().getId());
-        System.out.println("ID: " + locacaoDto.getImovel().getId());
-
-        Locacao locacao = new Locacao();
-        locacao.setAtivo(locacaoDto.getAtivo());
-        locacao.setObs(locacaoDto.getObs());
-        Cliente cliente = clienteService.findByIdORTrowBadRequestException(locacaoDto.getCliente().getId());
-        Imoveis imovel = imoveisService.findByIdORTrowBadRequestException(locacaoDto.getCliente().getId());
-
-        locacao.setCliente(cliente);
-        locacao.setImovel(imovel);
-
-        return locacaoService.save(locacao);
+    public LocacaoDto save(@RequestBody @Valid LocacaoInput locacaoInput){
+        return locacaoConvertAssembler
+                .convert_DTO(locacaoService.save(
+                        locacaoConvertD.convert_model(locacaoInput)
+                ));
 
     }
     @DeleteMapping(path = "/{id}")
@@ -75,9 +74,13 @@ public class LocacaoController {
         locacaoService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @PutMapping
-    public ResponseEntity <Void> replace(@RequestBody @Valid Locacao locacao){
-        locacaoService.replace(locacao);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @PutMapping(path = "/{id}")
+    public LocacaoDto replace (@PathVariable Long Id, @RequestBody @Valid LocacaoInput locacaoInput){
+        Locacao locacaoAtual = locacaoService.findByIdORTrowBadRequestException(Id);
+
+        locacaoConvertD.copiar_model(locacaoInput, locacaoAtual);
+
+        return locacaoConvertAssembler
+                .convert_DTO(locacaoService.save(locacaoAtual));
     }
 }

@@ -1,7 +1,8 @@
 package IFMA.Imobiliaria.controller;
 
+import IFMA.Imobiliaria.mapper.LocacaoConvertA;
+import IFMA.Imobiliaria.mapper.LocacaoConvertD;
 import IFMA.Imobiliaria.model.Alugueis;
-import IFMA.Imobiliaria.model.Locacao;
 import IFMA.Imobiliaria.service.AlugueisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +24,11 @@ import javax.validation.Valid;
 public class AlugueisController {
     @Autowired
     private  final AlugueisService alugueisService;
+    @Autowired
+    private LocacaoConvertA locacaoConvertAssembler;
+
+    @Autowired
+    private LocacaoConvertD locacaoConvertD;
 
     @GetMapping
     public ResponseEntity<Page<Alugueis>> list(@RequestParam(required = false) String nome,
@@ -44,7 +50,7 @@ public class AlugueisController {
         alugueisService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @PutMapping
+    @PutMapping(path = "/{id}")
     public ResponseEntity <Void> replace(@RequestBody @Valid Alugueis alugueis){
         alugueisService.replace(alugueis);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

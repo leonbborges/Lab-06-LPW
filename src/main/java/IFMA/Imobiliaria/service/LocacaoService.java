@@ -47,31 +47,23 @@ public class LocacaoService {
 
         return  locacaoRepository.save(locacao);
 }
-
+    @Transactional
     public void delete(Long id) {
         locacaoRepository.delete(findByIdORTrowBadRequestException(id));
     }
 
-    public void replace (Locacao locacao){
+    @Transactional
+    public Locacao replace (Locacao locacao){
         Long imovelId = locacao.getImovel().getId();
         Long clienteId = locacao.getCliente().getId();
 
         Cliente cliente = clienteService.findByIdORTrowBadRequestException(clienteId);
         Imoveis imovel = imovelService.findByIdORTrowBadRequestException(imovelId);
+        Locacao locacaoAtualizar = findByIdORTrowBadRequestException(locacao.getId());
 
         locacao.setImovel(imovel);
         locacao.setCliente(cliente);
 
-        Locacao saveLocacao = findByIdORTrowBadRequestException(locacao.getId());
-        Locacao locacao1 = Locacao.builder().alugueis(locacao.getAlugueis())
-                .ativo(locacao.getAtivo())
-                .data_fim(locacao.getData_fim())
-                .data_inicio(locacao.getData_inicio())
-                .dia_vencimento(locacao.getDia_vencimento())
-                .obs(locacao.getObs())
-                .perc_multa(locacao.getPerc_multa())
-                .valor_alugue(locacao.getValor_alugue())
-                .build();
-        locacaoRepository.save(locacao1);
+        return locacaoRepository.save(locacao);
     }
 }

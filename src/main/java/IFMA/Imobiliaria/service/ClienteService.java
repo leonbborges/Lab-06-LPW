@@ -7,11 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +26,11 @@ public class ClienteService {
 
     }
 
+    @Transactional
     public Cliente save(Cliente cliente) {
-        return  clienteRepository.save(Cliente.builder().nome_cliente(cliente.getNome_cliente())
-                .cpf(cliente.getCpf())
-                .dt_nascimento(cliente.getDt_nascimento())
-                .email(cliente.getEmail())
-                .telefone(cliente.getTelefone())
-                .build());
+        return clienteRepository.save(cliente);
     }
+
     public void delete(Long id) {
         clienteRepository.delete(findByIdORTrowBadRequestException(id));
     }
